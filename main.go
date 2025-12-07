@@ -2,13 +2,14 @@ package main
 
 import(
 	"net/http"
-	"fmt"
+	//"fmt"
 	"sync/atomic"
 	"log"
+	//"encoding/json"
 )
 
 type apiConfig struct {
-	fileServerHits atomic.Int32
+	fileserverHits atomic.Int32
 }
 
 func main(){
@@ -16,11 +17,12 @@ func main(){
 	multiplexer := http.NewServeMux()
 	
 	cfg:=  &apiConfig{}
-	cfg.fileServerHits.Store(0)
+	cfg.fileserverHits.Store(0)
 
-	multiplexer.HandleFunc("GET /healthz", handlerHealthz)
-	multiplexer.HandleFunc("GET /metrics", cfg.handlerMetrics )
-	multiplexer.HandleFunc("POST /reset", cfg.handlerReset)
+	multiplexer.HandleFunc("GET /api/healthz", handlerHealthz)
+	multiplexer.HandleFunc("GET /admin/metrics", cfg.handlerMetrics)
+	multiplexer.HandleFunc("POST /admin/reset", cfg.handlerReset)
+	multiplexer.HandleFunc("POST /api/validate_chirp", handlerValidate)
 	
 	var server http.Server
 	server.Handler = multiplexer
@@ -35,28 +37,11 @@ func main(){
 
 }
 
-func handlerHealthz (w http.ResponseWriter, req *http.Request){ 
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
-}
 
-func (cfg *apiConfig) handlerReset (w http.ResponseWriter, req *http.Request){
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	cfg.fileServerHits.Store(0)
 
-}
 
-func (cfg *apiConfig) handlerMetrics(w http.ResponseWriter, req *http.Request){
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf("Hits: %v\n", cfg.fileServerHits.Load())))
-}
 
-func (cfg *apiConfig) middlewareMetricsInc(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cfg.fileServerHits.Add(1)
-		next.ServeHTTP(w, r)
-	})
-}
+
+
+
+
