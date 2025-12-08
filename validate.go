@@ -13,40 +13,26 @@ func handlerValidate (w http.ResponseWriter, req *http.Request){
     }
 
 	max_chars := 140
-
-	type chirp struct {
-        Body string `json:"body"`
-    }
-
-	decoder := json.NewDecoder(req.Body)
-	chirpBody := chirp{}
-	err := decoder.Decode(&chirpBody)
+	
+	chirpBody, err := decode(req)
 	if err != nil{
 		log.Printf("Error decoding parameters: %s", err)
 		w.WriteHeader(500)
 		return
 	}
 
-	type responseInvalid struct {
-		Error string `json:"error"`	
-	}
-	type responseValid struct{
-		Valid bool   `json:"valid"`
-	}
-	
 	var status int
 	var res interface{}
 
 	if len(chirpBody.Body) > max_chars{
-		res = responseInvalid{
-			Error: "Chirp is too long",
-		}
-		status = http.StatusBadRequest
+		res, status = responseInvalid()
+
 	}else{
-		res = responseValid{
-			Valid: true,
-		}
-		status = http.StatusOK
+		validRes, s := responseValid()
+
+		validRes.Cleaned = censor(chirpBody.Body)
+		res = validRes
+		status = s
 	}
 
 	dat, err := json.Marshal(res)
@@ -55,8 +41,6 @@ func handlerValidate (w http.ResponseWriter, req *http.Request){
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-
 
 	w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(status)
