@@ -1,5 +1,15 @@
 package main
 
+import (
+	"sync/atomic"
+	"github.com/jaharbaugh/chirpy/internal/database"
+)
+
+type apiConfig struct {
+	fileserverHits atomic.Int32
+	db *database.Queries
+}
+
 type Chirp struct {
     Body string `json:"body"`
 }

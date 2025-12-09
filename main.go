@@ -3,22 +3,30 @@ package main
 import(
 	"net/http"
 	//"fmt"
-	"sync/atomic"
+	//"sync/atomic"
 	"log"
 	//"encoding/json"
 	//"strings"
+	_ "github.com/lib/pq"
+	"os"
+	"database/sql"
+	"github.com/joho/godotenv"
+	"github.com/jaharbaugh/chirpy/internal/database"
 )
 
-type apiConfig struct {
-	fileserverHits atomic.Int32
-}
-
 func main(){
-
+	godotenv.Load()
+	dbURL:= os.Getenv("DB_URL")
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil{
+		panic(err)
+	}
+	
 	multiplexer := http.NewServeMux()
 	
 	cfg:=  &apiConfig{}
 	cfg.fileserverHits.Store(0)
+	cfg.db = database.New(db)
 
 	multiplexer.HandleFunc("GET /api/healthz", handlerHealthz)
 	multiplexer.HandleFunc("GET /admin/metrics", cfg.handlerMetrics)
