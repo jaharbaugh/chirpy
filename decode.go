@@ -7,15 +7,9 @@ import(
 )
 
 
-func decode (req *http.Request) (Chirp, error) {
-
+func decode[T any](req *http.Request) (T, error) {
+	var v T
 	decoder := json.NewDecoder(req.Body)
-	chirpBody := Chirp{}
-	err := decoder.Decode(&chirpBody)
-	if err != nil{
-		return Chirp{}, err
-	}
-
-	return chirpBody, nil
-
+	err := decoder.Decode(&v)
+	return v, err
 }

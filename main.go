@@ -27,12 +27,14 @@ func main(){
 	cfg:=  &apiConfig{}
 	cfg.fileserverHits.Store(0)
 	cfg.db = database.New(db)
+	cfg.Platform =os.Getenv("PLATFORM")
 
 	multiplexer.HandleFunc("GET /api/healthz", handlerHealthz)
 	multiplexer.HandleFunc("GET /admin/metrics", cfg.handlerMetrics)
 	multiplexer.HandleFunc("POST /admin/reset", cfg.handlerReset)
 	multiplexer.HandleFunc("POST /api/validate_chirp", handlerValidate)
-	
+	multiplexer.HandleFunc("POST /api/users", cfg.handlerUsers)
+
 	var server http.Server
 	server.Handler = multiplexer
 	server.Addr = ":8080"

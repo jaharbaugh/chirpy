@@ -2,8 +2,6 @@ package main
 
 import(
 	"net/http"
-	"encoding/json"
-	"log"
 )
 
 func handlerValidate (w http.ResponseWriter, req *http.Request){ 
@@ -14,10 +12,9 @@ func handlerValidate (w http.ResponseWriter, req *http.Request){
 
 	max_chars := 140
 	
-	chirpBody, err := decode(req)
+	chirpBody, err := decode[Chirp](req)
 	if err != nil{
-		log.Printf("Error decoding parameters: %s", err)
-		w.WriteHeader(500)
+		respondWithError(w, http.StatusInternalServerError, "Error decoding parameters", err)
 		return
 	}
 
@@ -25,7 +22,8 @@ func handlerValidate (w http.ResponseWriter, req *http.Request){
 	var res interface{}
 
 	if len(chirpBody.Body) > max_chars{
-		res, status = responseInvalid()
+		err := "Chirp too long" 
+		res, status = responseInvalid(err)
 
 	}else{
 		validRes, s := responseValid()
@@ -35,15 +33,5 @@ func handlerValidate (w http.ResponseWriter, req *http.Request){
 		status = s
 	}
 
-	dat, err := json.Marshal(res)
-	if err != nil {
-		log.Printf("Error marshalling JSON: %s", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(status)
-	w.Write(dat)
-
+	respondJSON(w, status, res)
 }
