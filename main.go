@@ -33,6 +33,7 @@ func main(){
 	multiplexer.HandleFunc("GET /admin/metrics", cfg.handlerMetrics)
 	multiplexer.HandleFunc("POST /admin/reset", cfg.handlerReset)
 	multiplexer.HandleFunc("POST /api/chirps", cfg.handlerChirpsCreate)
+	multiplexer.HandleFunc("GET /api/chirps", cfg.handlerGetChirps)
 	multiplexer.HandleFunc("POST /api/users", cfg.handlerUsers)
 
 	var server http.Server
