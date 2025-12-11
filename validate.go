@@ -1,37 +1,20 @@
 package main
 
 import(
-	"net/http"
+	"errors"
 )
 
-func handlerValidate (w http.ResponseWriter, req *http.Request){ 
-	if req.Method != http.MethodPost {
-        w.WriteHeader(http.StatusMethodNotAllowed)
-        return
-    }
-
-	max_chars := 140
+func Validate (body string)(string, error){ 
+	const maxChars = 140
 	
-	chirpBody, err := decode[Chirp](req)
-	if err != nil{
-		respondWithError(w, http.StatusInternalServerError, "Error decoding parameters", err)
-		return
-	}
-
-	var status int
-	var res interface{}
-
-	if len(chirpBody.Body) > max_chars{
-		err := "Chirp too long" 
-		res, status = responseInvalid(err)
+	if len(body) > maxChars{
+		 
+		return "", errors.New("Chirp too long")
+		
 
 	}else{
-		validRes, s := responseValid()
+		cleaned := censor(body)
+		return cleaned, nil
+	} 
 
-		validRes.Cleaned = censor(chirpBody.Body)
-		res = validRes
-		status = s
-	}
-
-	respondJSON(w, status, res)
 }
