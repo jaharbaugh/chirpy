@@ -3,6 +3,8 @@ package main
 import(
 	"net/http"
 	"log"
+	"github.com/jaharbaugh/chirpy/internal/auth"
+	"github.com/jaharbaugh/chirpy/internal/database"
 )
 
 func (cfg *apiConfig) handlerUsers(w http.ResponseWriter, req *http.Request){
@@ -18,7 +20,16 @@ func (cfg *apiConfig) handlerUsers(w http.ResponseWriter, req *http.Request){
 		return
 	}
 
-	res, err := cfg.db.CreateUser(req.Context(), newUser.Email)
+	hashedPW, err := auth.HashPassword(newUser.Password)
+		if err != nil{
+			log.Printf("CreateUser error: %v", err)
+			respondWithError(w, http.StatusInternalServerError, "Password Error", err)
+		}
+	var createUser database.CreateUserParams
+		createUser.Email = newUser.Email
+		createUser.HashedPassword = hashedPW
+
+	res, err := cfg.db.CreateUser(req.Context(), createUser)
 	if err != nil{
 		log.Printf("CreateUser error: %v", err)
 		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err)

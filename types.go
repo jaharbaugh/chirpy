@@ -38,6 +38,7 @@ type ResponseValid struct{
 
 type NewUserParams struct {
 	Email string `json:"email"`
+	Password string `json:"password"`
 }
 
 type User struct {
@@ -45,4 +46,5 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time	 `json:"updated_at"`
 	Email string `json:"email"`
+	HashedPassword string `json:"-"`
 }
