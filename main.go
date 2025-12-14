@@ -24,10 +24,11 @@ func main(){
 	
 	multiplexer := http.NewServeMux()
 	
-	cfg:=  &apiConfig{}
+	cfg :=  &apiConfig{}
 	cfg.fileserverHits.Store(0)
 	cfg.db = database.New(db)
-	cfg.Platform =os.Getenv("PLATFORM")
+	cfg.Platform = os.Getenv("PLATFORM")
+	cfg.JWTSecret = os.Getenv("JWT_SECRET")
 
 	multiplexer.HandleFunc("GET /api/healthz", handlerHealthz)
 	multiplexer.HandleFunc("GET /admin/metrics", cfg.handlerMetrics)

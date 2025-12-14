@@ -11,6 +11,7 @@ type apiConfig struct {
 	fileserverHits atomic.Int32
 	db *database.Queries
 	Platform string
+	JWTSecret string
 	
 }
 
@@ -39,6 +40,7 @@ type ResponseValid struct{
 type NewUserParams struct {
 	Email string `json:"email"`
 	Password string `json:"password"`
+	ExpiresInSeconds time.Duration `json:"expires_in_secpnds"`
 }
 
 type User struct {
@@ -47,4 +49,6 @@ type User struct {
 	UpdatedAt time.Time	 `json:"updated_at"`
 	Email string `json:"email"`
 	HashedPassword string `json:"-"`
+	Token string `json:"token"`
+
 }
