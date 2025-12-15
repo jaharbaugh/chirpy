@@ -27,13 +27,6 @@ func (cfg *apiConfig) handlerUpdateUser (w http.ResponseWriter, req *http.Reques
     	return
 	}
 
-	/*dbUser, err := cfg.db.GetUserByToken(req.Context(), tokenUserID)
-	if err != nil{
-		log.Printf("User Not Found Error: %v", err)
-		respondWithError(w, http.StatusUnauthorized, "User not found", err)
-		return
-	}*/
-
 	userUpdates, err := decode[NewUserParams](req)
 	if err != nil{
 		log.Printf("Could not parse request: %v", err)

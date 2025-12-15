@@ -37,7 +37,9 @@ func main(){
 	multiplexer.HandleFunc("POST /api/chirps", cfg.handlerChirpsCreate)
 	multiplexer.HandleFunc("GET /api/chirps", cfg.handlerGetChirps)
 	multiplexer.HandleFunc("GET /api/chirps/{chirpID}", cfg.handlerGetChirpsByID)
-	
+	multiplexer.HandleFunc("DELETE /api/chirps/{chirpID}", cfg.handlerDeleteChirp)
+
+
 	multiplexer.HandleFunc("POST /api/users", cfg.handlerUsers)
 	multiplexer.HandleFunc("PUT /api/users", cfg.handlerUpdateUser)
 	multiplexer.HandleFunc("POST /api/login", cfg.handlerLogin)
