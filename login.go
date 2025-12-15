@@ -5,6 +5,7 @@ import(
 	"log"
 	"time"
 	"github.com/jaharbaugh/chirpy/internal/auth"
+	"github.com/jaharbaugh/chirpy/internal/database"
 )
 
 func (cfg *apiConfig) handlerLogin (w http.ResponseWriter, req *http.Request){
@@ -20,7 +21,7 @@ func (cfg *apiConfig) handlerLogin (w http.ResponseWriter, req *http.Request){
 		return
 	}
 
-	var expires time.Duration
+	/* var expires time.Duration
 	if unverifiedUser.ExpiresInSeconds > 0{
 		expires = time.Duration(unverifiedUser.ExpiresInSeconds) * time.Second
 		if expires > time.Hour{
@@ -28,7 +29,7 @@ func (cfg *apiConfig) handlerLogin (w http.ResponseWriter, req *http.Request){
 		}
 	}else{
 		expires = time.Hour
-	}
+	}*/
 
 	dbUser, err := cfg.db.GetUserByEmail(req.Context(), unverifiedUser.Email)
 	if err != nil{
@@ -44,9 +45,28 @@ func (cfg *apiConfig) handlerLogin (w http.ResponseWriter, req *http.Request){
 		return
 	}
 
-	token, err := auth.MakeJWT(dbUser.ID, cfg.JWTSecret, expires)
+	token, err := auth.MakeJWT(dbUser.ID, cfg.JWTSecret, time.Hour)
 	if err != nil{
 		log.Printf("Could not make JWT Token: %v", err)
+		respondWithError(w, http.StatusInternalServerError, "User not found", err)
+		return
+	}
+
+	refreshTokenString, err := auth.MakeRefreshToken()
+	if err != nil{	
+		log.Printf("Could not make Refresh Token String: %v", err)
+		respondWithError(w, http.StatusInternalServerError, "User not found", err)
+		return
+	}
+
+	var newRefreshToken database.CreateRefreshTokenParams
+	newRefreshToken.Token = refreshTokenString
+	newRefreshToken.UserID = dbUser.ID
+	//newRefreshToken.ExpiresAt = time.Now().UTC().Add(60 * 24 * time.Hour)
+
+	refreshToken, err := cfg.db.CreateRefreshToken(req.Context(), newRefreshToken)
+	if err != nil{
+		log.Printf("Could not make Refresh Token: %v", err)
 		respondWithError(w, http.StatusInternalServerError, "User not found", err)
 		return
 	}
@@ -57,6 +77,7 @@ func (cfg *apiConfig) handlerLogin (w http.ResponseWriter, req *http.Request){
 	verifiedUser.UpdatedAt = dbUser.UpdatedAt
 	verifiedUser.Email = dbUser.Email
 	verifiedUser.Token = token
+	verifiedUser.RefreshToken = refreshToken.Token
 
 	respondJSON(w, http.StatusOK, verifiedUser)
 

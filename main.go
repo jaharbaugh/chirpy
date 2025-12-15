@@ -39,7 +39,10 @@ func main(){
 	multiplexer.HandleFunc("GET /api/chirps/{chirpID}", cfg.handlerGetChirpsByID)
 	
 	multiplexer.HandleFunc("POST /api/users", cfg.handlerUsers)
+	multiplexer.HandleFunc("PUT /api/users", cfg.handlerUpdateUser)
 	multiplexer.HandleFunc("POST /api/login", cfg.handlerLogin)
+	multiplexer.HandleFunc("POST /api/refresh", cfg.handlerRefresh)
+	multiplexer.HandleFunc("POST /api/revoke", cfg.handlerRevoke)
 
 	var server http.Server
 	server.Handler = multiplexer

@@ -17,7 +17,7 @@ type apiConfig struct {
 
 type NewChirpParams struct {
     Body string `json:"body"`
-	UserID uuid.UUID `json:"user_id"`
+	//UserID uuid.UUID `json:"user_id"`
 }
 
 type Chirp struct{
@@ -50,5 +50,10 @@ type User struct {
 	Email string `json:"email"`
 	HashedPassword string `json:"-"`
 	Token string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
 
+}
+
+type NewAccessToken struct{
+	Token string `json:"token"`
 }
