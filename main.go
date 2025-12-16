@@ -29,6 +29,7 @@ func main(){
 	cfg.db = database.New(db)
 	cfg.Platform = os.Getenv("PLATFORM")
 	cfg.JWTSecret = os.Getenv("JWT_SECRET")
+	cfg.PolkaKey = os.Getenv("POLKA_KEY")
 
 	multiplexer.HandleFunc("GET /api/healthz", handlerHealthz)
 	multiplexer.HandleFunc("GET /admin/metrics", cfg.handlerMetrics)
@@ -45,6 +46,7 @@ func main(){
 	multiplexer.HandleFunc("POST /api/login", cfg.handlerLogin)
 	multiplexer.HandleFunc("POST /api/refresh", cfg.handlerRefresh)
 	multiplexer.HandleFunc("POST /api/revoke", cfg.handlerRevoke)
+	multiplexer.HandleFunc("POST /api/polka/webhooks", cfg.handlerUpgradeChirpyRed)
 
 	var server http.Server
 	server.Handler = multiplexer

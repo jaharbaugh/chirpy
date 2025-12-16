@@ -41,6 +41,7 @@ func (cfg *apiConfig) handlerUsers(w http.ResponseWriter, req *http.Request){
 	user.CreatedAt = res.CreatedAt
 	user.UpdatedAt = res.UpdatedAt
 	user.Email = res.Email
+	user.IsChirpyRed = false
 
 	respondJSON(w, http.StatusCreated, user)
 

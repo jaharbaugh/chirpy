@@ -12,6 +12,7 @@ type apiConfig struct {
 	db *database.Queries
 	Platform string
 	JWTSecret string
+	PolkaKey string
 	
 }
 
@@ -40,7 +41,7 @@ type ResponseValid struct{
 type NewUserParams struct {
 	Email string `json:"email"`
 	Password string `json:"password"`
-	ExpiresInSeconds time.Duration `json:"expires_in_secpnds"`
+	//ExpiresInSeconds time.Duration `json:"expires_in_secpnds"`
 }
 
 type User struct {
@@ -51,9 +52,19 @@ type User struct {
 	HashedPassword string `json:"-"`
 	Token string `json:"token"`
 	RefreshToken string `json:"refresh_token"`
+	IsChirpyRed bool `json:"is_chirpy_red"`
 
 }
 
-type NewAccessToken struct{
+type NewAccessToken struct {
 	Token string `json:"token"`
+}
+
+type Webhook struct {
+	Event string `json:"event"`
+	Data WebhookData `json:"data"`
+}
+
+type WebhookData struct {
+	UserID string `json:"user_id"`
 }

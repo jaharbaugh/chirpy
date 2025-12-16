@@ -21,16 +21,6 @@ func (cfg *apiConfig) handlerLogin (w http.ResponseWriter, req *http.Request){
 		return
 	}
 
-	/* var expires time.Duration
-	if unverifiedUser.ExpiresInSeconds > 0{
-		expires = time.Duration(unverifiedUser.ExpiresInSeconds) * time.Second
-		if expires > time.Hour{
-			expires = time.Hour
-		}
-	}else{
-		expires = time.Hour
-	}*/
-
 	dbUser, err := cfg.db.GetUserByEmail(req.Context(), unverifiedUser.Email)
 	if err != nil{
 		log.Printf("User login error: %v", err)
@@ -62,7 +52,6 @@ func (cfg *apiConfig) handlerLogin (w http.ResponseWriter, req *http.Request){
 	var newRefreshToken database.CreateRefreshTokenParams
 	newRefreshToken.Token = refreshTokenString
 	newRefreshToken.UserID = dbUser.ID
-	//newRefreshToken.ExpiresAt = time.Now().UTC().Add(60 * 24 * time.Hour)
 
 	refreshToken, err := cfg.db.CreateRefreshToken(req.Context(), newRefreshToken)
 	if err != nil{
@@ -78,6 +67,7 @@ func (cfg *apiConfig) handlerLogin (w http.ResponseWriter, req *http.Request){
 	verifiedUser.Email = dbUser.Email
 	verifiedUser.Token = token
 	verifiedUser.RefreshToken = refreshToken.Token
+	verifiedUser.IsChirpyRed = dbUser.IsChirpyRed
 
 	respondJSON(w, http.StatusOK, verifiedUser)
 
